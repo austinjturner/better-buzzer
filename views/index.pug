@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  nav.navbar.sticky-top.navbar-dark.bg-primary
+    a.navbar-brand(href='#') Better Buzzer
+  container.fill
+    .h-100.row.align-items-center
+      .col  
+        .card.text-center.w-50.shadow-lg 
+          .card-header
+            | Better Buzzer
+          .card-body
+            h5.card-title Create and join buzzer lobbies
+            a(href='/host')
+              button#hostButton.btn.btn-primary(type='button') Host a Lobby
+          .card-footer.text-muted.copyright() © 2020
+

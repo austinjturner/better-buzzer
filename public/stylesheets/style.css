@@ -1,0 +1,264 @@
+html, body {
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.modal, .modal-dialog {
+  overflow-y: hidden;
+}
+
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #333;
+}
+
+a {
+  color: #00B7FF;
+  padding: 10px;
+}
+
+
+
+.box {
+  margin:50px;
+  width: 15vh;
+  height: 15vh;
+  border-radius:50px;
+  background:#630808;
+  display: inline-block;
+}
+
+.box-on {
+  margin:50px;
+  width: 15vh;
+  height: 15vh;
+  background:#ff0000;
+  box-shadow: 0 0 20px #fff;
+}
+
+.buzzer-box{
+  height: 100%;
+  background-color: #333;
+  text-align: center;
+}
+
+
+.card {
+  margin: 0 auto; /* Added */
+  float: none; /* Added */
+  margin-bottom: 10px; /* Added */
+  font: 28px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.copyright {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.fill {
+  top: 40px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  width: auto;
+  height: auto;
+}
+
+.page-item{
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+#sidebar {
+  min-width: 250px;
+  max-width: 250px;
+  min-height: 100vh;
+  /*background: #7386D5;*/
+  transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+  transform-origin: center left; /* Set the transformed position of sidebar to center left side. */
+}
+
+#sidebar.active {
+  margin-left: -250px;
+  transform: rotateY(100deg); /* Rotate sidebar vertically by 100 degrees. */
+}
+
+#sidebar .sidebar-header {
+  padding: 20px;
+}
+
+#sidebarCollapse {
+  width: 40px;
+  height: 40px;
+  border: 0;
+}
+
+#sidebarCollapse span {
+  width: 80%;
+  height: 2px;
+  margin: 0 auto;
+  display: block;
+  background: #555;
+  transition: all 0.8s cubic-bezier(0.810, -0.330, 0.345, 1.375);
+}
+
+#sidebarCollapse span:first-of-type {
+  /* rotate first one */
+  transform: rotate(45deg) translate(2px, 2px);
+}
+#sidebarCollapse span:nth-of-type(2) {
+  /* second one is not visible */
+  opacity: 0;
+}
+#sidebarCollapse span:last-of-type {
+  /* rotate third one */
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+#sidebarCollapse.active span {
+  /* no rotation */
+  transform: none;
+  /* all bars are visible */
+  opacity: 1;
+  margin: 5px auto;
+}
+
+#content {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  /* Reversing the behavior of the sidebar: 
+     it'll be rotated vertically and off canvas by default, 
+     collapsing in on toggle button click with removal of 
+     the vertical rotation.   */
+  #sidebar {
+      margin-left: -250px;
+      transform: rotateY(100deg);
+  }
+  #sidebar.active {
+      margin-left: 0;
+      transform: none;
+  }
+
+  /* Reversing the behavior of the bars: 
+     Removing the rotation from the first,
+     last bars and reappear the second bar on default state, 
+     and giving them a vertical margin */
+  #sidebarCollapse span:first-of-type,
+  #sidebarCollapse span:nth-of-type(2),
+  #sidebarCollapse span:last-of-type {
+      transform: none;
+      opacity: 1;
+      margin: 5px auto;
+  }
+
+  /* Removing the vertical margin and make the first and last bars rotate again when the sidebar is open, hiding the second bar */
+  #sidebarCollapse.active span {
+      margin: 0 auto;
+  }
+  #sidebarCollapse.active span:first-of-type {
+      transform: rotate(45deg) translate(2px, 2px);
+  }
+  #sidebarCollapse.active span:nth-of-type(2) {
+      opacity: 0;
+  }
+  #sidebarCollapse.active span:last-of-type {
+      transform: rotate(-45deg) translate(1px, -1px);
+  }
+}
+
+
+
+#sidebar-right {
+  min-width: 750px;
+  max-width: 750px;
+  min-height: 100vh;
+  /*background: #7386D5;*/
+  transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+  transform-origin: center right; /* Set the transformed position of sidebar to center left side. */
+}
+
+#sidebar-right.active {
+  margin-right: -750px;
+  transform: rotateY(100deg); /* Rotate sidebar vertically by 100 degrees. */
+}
+
+#sidebar-right .sidebar-header {
+  padding: 20px;
+}
+
+#sidebar-right .d-flex {
+  height: 100%;
+}
+
+#dismiss {
+  font-size: 20px;
+}
+
+#sidebarRightCollapse {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  font-size: 30px;
+}
+
+#canvasContainer{
+  height: 70%;
+}
+
+#button-bottom{
+  position: relative;
+  background: #c0392b;
+  height: 36vh;
+  width: 60%;
+  border-radius: 25px;
+  margin: 0 20% 0 20%;
+  text-align:center;
+}
+
+
+#button-top{
+  background: #c0392b;
+  outline: none;
+  border: none;
+  margin-top: 9vh;
+  height: 18vh;
+  width: 18vh;
+  position: relative;
+}
+
+#i1 {
+  position: absolute;
+  max-width:100%;
+  max-height:100%;
+  bottom: 0;
+  left: 0;
+}
+
+#i2 {
+  position: absolute;
+  max-width: 81.081%;
+  max-height: 81.081%;
+  bottom: 0;
+  left: 0;
+}
+
+#sidebar .sidebar-header {
+  height: 100%;
+}
+
+#sidebar .d-flex {
+  height: 100%; 
+}

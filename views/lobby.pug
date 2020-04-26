@@ -1,0 +1,18 @@
+extends combine
+
+block page
+  script(src='/javascripts/lobby.js')
+  .container
+    .container.page-item
+      .buzzer-box
+        .box#lightBox
+        #button-bottom.button
+          button#button-top
+            img#i1(src='/images/buzzer-unpressed.svg' alt='Unpressed Buzzer' draggable='false')
+            img#i2(hidden src='/images/buzzer-pressed.svg' alt='Pressed Buzzer' draggable='false')
+      
+
+
+
+
+

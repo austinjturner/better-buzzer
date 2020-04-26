@@ -1,0 +1,16 @@
+extends combine
+
+block page
+  script(src='/javascripts/host.js')
+  .container
+    .container.page-item
+      h3.text-light Enable Buzzer
+      input#toggle(type='checkbox' checked='' data-toggle='toggle' data-width='100%' data-height='75' data-on="Active" data-off="Frozen" data-offstyle="secondary")
+    .container.page-item
+      h3.text-light Add Members
+      p.text-light Members can join at the link
+      .input-group.mb-3
+        .input-group-prepend
+            button#copyBtn.btn.btn-primary(type='button')
+              i.fas.fa-copy
+        input#linkText.form-control(type='text' value='/lobby/'+lobbyId readonly='')

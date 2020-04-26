@@ -1,0 +1,63 @@
+extends layout
+
+block content
+  script(src='/javascripts/combine.js')
+  link(href='https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css' rel='stylesheet')
+  script(src='https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js')
+  .wrapper
+    nav#sidebar.bg-light
+      .sidebar-header.bg-light
+        .d-flex.flex-column.bd-highlight.mb-3
+          .mb-auto.p-2.bd-highlight
+            h1 Lobby
+            hr
+            h4 Host
+            #host
+              .spinner-grow.spinner-grow-sm(role='status')
+                span.sr-only Loading...
+            hr
+            h4 Members
+            ul#memberList.list-group.list-group-flush
+              li.list-group-item.list-group-item-dark No members
+          .mt-auto.p-2.bd-highlight
+            span
+              input#soundToggle.float-bottom(type='checkbox' checked='' data-width='100%' data-toggle='toggle' data-on="Sound On" data-off="Sound Off")
+    #content
+      nav.navbar.sticky-top.navbar-dark.bg-primary
+        button#sidebarCollapse.navbar-btn.bg-primary(type='button')
+          span
+          span
+          span
+        div
+        a.navbar-brand(href='/') Better Buzzer
+        
+      button#sidebarRightCollapse.btn.btn-danger
+        i.fas.fa-chart-bar
+      block page
+    nav#sidebar-right.bg-light.active
+      .d-flex.flex-row.bd-highlight.mb-3.align-items-center
+        .p-2.bd-highlight
+          #dismiss.btn.btn-primary
+            i.fas.fa-arrow-right
+        .p-2.bd-highlight#canvasContainer.flex-fill
+          canvas#resultsCanvas
+      
+
+
+  //
+  // MODALS
+  //
+
+  #chooseNameModal.modal.fade(data-backdrop='static' tabindex='-1' role='dialog' aria-labelledby='staticBackdropLabel' aria-hidden='true')
+    .modal-dialog.modal-dialog-centered(role='document')
+      .modal-content
+        .modal-header
+          h5.modal-title Choose your name
+        .modal-body
+          .input-group.mb-3
+            .input-group-prepend
+              span.input-group-text Name
+            input#chooseNameTextInput.form-control(type='text')
+        .modal-footer
+          button#chooseNameButton.btn.btn-primary(type='button') Continue
