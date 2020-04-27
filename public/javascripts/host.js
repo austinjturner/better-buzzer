@@ -1,4 +1,6 @@
 
+var pageCache = {};
+
 $( document ).ready(() => {
     $('#toggle').bootstrapToggle({
         on: 'Active',
@@ -8,7 +10,7 @@ $( document ).ready(() => {
     $('#toggle').bootstrapToggle('off');
 
     $('#toggle').change(function() {
-        if ($(this).prop('checked')){
+        if ($('#toggle').prop('checked')){
             sendWsMessage(WS_HOST_ACTIVE_MSG, {lobbyId: getLobbyId()});
         } else {
             sendWsMessage(WS_HOST_FREEZE_MSG, {lobbyId: getLobbyId()});
@@ -33,37 +35,22 @@ $( document ).ready(() => {
         window.getSelection().removeAllRanges();
     });
 
+    $('#resetButton').click(e => {
+        // simulate reset by flipping button twice
+        let active = $('#toggle').prop('checked');
+        if (active) sendWsMessage(WS_HOST_FREEZE_MSG, {lobbyId: getLobbyId()});
+        sendWsMessage(WS_HOST_ACTIVE_MSG, {lobbyId: getLobbyId()});
+        if (!active) sendWsMessage(WS_HOST_FREEZE_MSG, {lobbyId: getLobbyId()});
+    });
 
-    // Open websocket
-    //initWebsocket(window.location.hostname);
-    /*sendWsMessage(WS_HOST_REGISTER_MSG, {
-        lobbyId: getLobbyId(),
-        id: getCookieValue(ID_COOKIE),
-    });*/
-
-    /*document.addEventListener(WS_MEMBER_LIST_MSG, function(e) {
+    document.addEventListener(WS_PAGE_UPDATE_MSG, function(e) {
         var data = e.detail;  // the "data" from the server is here
-        updateMembers(data.members);
-    });*/
+        updateHostPage(data);
+    });
 
     init();
 })
-/*
-function updateMembers(members){
-    $('#memberList').empty();
-    if (Object.keys(members).length == 0){
-        $('#memberList').append(`
-            <a class="list-group-item list-group-item-action" href="#">No members</a>
-        `)
-    } else {
-        for (id in members){
-            $('#memberList').append(`
-                <a class="list-group-item list-group-item-action" href="#">${members[id].name}</a>
-            `)
-        }
-    }
 
-}*/
 
 function init(){
     var lobbyId = getLobbyId();
@@ -79,4 +66,14 @@ function init(){
         lobbyId: lobbyId, 
         userName: getName(),
     });
+}
+
+function updateHostPage(data){
+    // detect the first buzz
+    if (pageCache.round && pageCache.round.length == 0 && data.round.length > 0){
+        playBuzzerNoise();
+        openRightCollapse();
+    }
+
+    pageCache = data;
 }

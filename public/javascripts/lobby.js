@@ -9,7 +9,9 @@ const WS_BUZZER_RESULTS_MSG = 'buzzer-results';
 const TOO_SOON_PENALTY_MS = 500;
 
 var buzzerState = {
-    active: false,
+    indicator: false,
+    disabled: false,
+    locked: false,
     timestamp: null,
     disabled: false,
 }
@@ -18,14 +20,6 @@ var pageCache = {};
 
 
 $(() => {
-    // setInterval(pingServer, pingIntervalMS)
-    /*var lobbyId = getLobbyId();
-    if (getCookie(lobbyId)){
-        initBuzzer(lobbyId);
-    } else {
-        $('#'+chooseNameModalId).modal('show');
-    }*/
-
     $("#nameText").change(function(){
         updateName();
     });
@@ -35,37 +29,25 @@ $(() => {
     })
 
     $('#button-top').mousedown(() => {
+        if (buzzerState.locked) return;
+
         $('#i1').attr('hidden', true);
         $('#i2').attr('hidden', false);
-        playBuzzerNoise();
+        handleBuzzerClick();
     })
 
     $(document).mouseup(() => {
+        if (buzzerState.locked) return;
+
         $('#i1').attr('hidden', false);
         $('#i2').attr('hidden', true);
     })
-
-
-    document.addEventListener(WS_MEMBER_ACTIVE_MSG, function(e) {
-        var data = e.detail;  // the "data" from the server is here
-        buzzerState.active = true;
-        buzzerState.disabled = false;
-        buzzerState.timestamp = getTime();
-        $('#lightBox').addClass('box-on');
-    });
-
-    document.addEventListener(WS_MEMBER_FREEZE_MSG, function(e) {
-        var data = e.detail;  // the "data" from the server is here
-        buzzerState.active = false;
-        $('#lightBox').removeClass('box-on');
-    });
-
 
     document.addEventListener(WS_PAGE_UPDATE_MSG, function(e) {
         var data = e.detail;  // the "data" from the server is here
         updateLobbyPage(data);
     });
-
+    
     freezeBuzzer(); // default is frozen
     init();
 })
@@ -83,15 +65,32 @@ function updateLobbyPage(data){
     pageCache = data;
 }
 
+function setIndicatorActive(active){
+    if (active){
+        $('#lightBox').addClass('box-on');
+    } else {
+        $('#lightBox').removeClass('box-on');
+    }
+}
+
+function setBuzzerActive(active){
+    if (active){
+        buzzerState.timestamp = getTime();
+        buzzerState.active = true;
+    } else {
+        buzzerState.active = false;
+    }
+}
+
 function activeBuzzer(){
-    buzzerState.active = true;
+    buzzerState.indicator = true;
     buzzerState.disabled = false;
     buzzerState.timestamp = getTime();
     $('#lightBox').addClass('box-on');
 }
 
 function freezeBuzzer(){
-    buzzerState.active = false;
+    buzzerState.indicator = false;
     $('#lightBox').removeClass('box-on');
 }
 
@@ -105,55 +104,50 @@ function init(){
         return;
     }
 
-    //console.log('here');
 
     // Open websocket
-    //initWebsocket(window.location.hostname);
     sendWsMessage(WS_MEMBER_REGISTER_MSG, {
         userId: getCookieValue(ID_COOKIE),
         lobbyId: lobbyId, 
         userName: getName(),
     });
-    //updateName();
 }
 
 function getTime(){
     return Date.now();
 }
 
-/*
-function updateName(){
-    var name = getName() || 'Anonymous';
-    sendWsMessage(WS_MEMBER_NAME_MSG, {
-        lobbyId: getLobbyId(),
-        name: name,
-    })
-}*/
-
 function handleBuzzerClick(){
     if (buzzerState.disabled){
         return;
     }
 
-    if (buzzerState.active){
-        //playBuzzerNoise();
+    if (buzzerState.indicator){
+        playBuzzerNoise();
         buzzerState.disabled = true;
+
         var delta = getTime() - buzzerState.timestamp;
-        console.log('delta = '+delta);
         sendWsMessage(WS_MEMBER_BUZZER_MSG, {
             lobbyId: getLobbyId(),
             delta: delta,
         })
+
+        openRightCollapse();
     } else {
         // too soon penalty
-        $('#penalty-box').removeAttr('hidden');
         buzzerState.disabled = true;
-        $('#buzzer').text('Too Early');
+        buzzerState.locked = true;
+        
+        $('#i3').attr('hidden', false);
+        $('#i2').attr('hidden', false);
+        $('#i1').attr('hidden', true);
 
         setTimeout(()=>{
-            buzzerState.disabled = false;
-            $('#buzzer').text('');
-            $('#penalty-box').attr('hidden', true);
+            buzzerState.disabled = false;           
+            buzzerState.locked = false;
+            $('#i3').attr('hidden', true);
+            $('#i2').attr('hidden', true);
+            $('#i1').attr('hidden', false);
         }, TOO_SOON_PENALTY_MS)
     }
 }

@@ -28,7 +28,6 @@ function initWebsocket(hostname){
             return console.error(err);
         }
         
-        console.log(message)
         var event = new CustomEvent(message.type, {'detail': message.data})
         document.dispatchEvent(event); 
     }

@@ -4,6 +4,7 @@ const WS_HOST_NAME_MSG = 'host-name';
 const WS_MEMBER_LIST_MSG = 'member-list';
 const WS_HOST_ACTIVE_MSG = 'host-active';
 const WS_HOST_FREEZE_MSG = 'host-freeze';
+const WS_HOST_RESET_MSG = 'host-reset';
 const WS_PAGE_UPDATE_MSG = 'page-update';
 const WS_REQUEST_PAGE_UPDATE_MSG = 'request-page-update';
 
@@ -18,6 +19,8 @@ let audio = new Audio(src);
 let muted = false;
 
 $(() => {
+    chartManager.init('resultsCanvas');
+
     var lobbyId = getLobbyId();
     if (!getCookie(lobbyId)){
         $('#'+chooseNameModalId).modal('show');
@@ -39,7 +42,6 @@ $(() => {
 
     $('#soundToggle').change(function() {
         muted = !$(this).prop('checked');
-        console.log('muted: '+muted);
     })
 
 
@@ -65,8 +67,6 @@ $(() => {
 
     $('#sidebarRightCollapse').on('click', function () {
         setRightPanel(true);
-        //$('#sidebar-right').removeClass('active');
-        //$('#sidebarRightCollapse').hide();
 
         // close left panel
         setLeftPanel(false);
@@ -74,16 +74,10 @@ $(() => {
 
     $('#dismiss').on('click', function () {
         setRightPanel(false);
-        //$('#sidebar-right').addClass('active');
-        //$('#sidebarRightCollapse').show();
     });
 
     // Open websocket
     initWebsocket(window.location.hostname);
-    //sendWsMessage(WS_HOST_REGISTER_MSG, {
-    //    lobbyId: getLobbyId(),
-    //    id: getCookieValue(ID_COOKIE),
-    //});
 
     document.addEventListener(WS_PAGE_UPDATE_MSG, function(e) {
         var data = e.detail;  // the "data" from the server is here
@@ -156,11 +150,15 @@ function updateLobby(hostName, memberNameList){
     }
 }
 
+function openRightCollapse(){
+    $('#sidebarRightCollapse').click();
+}
+
 function updateChart(round){
     let data = [];
     for (entry of round){
         data.push({
-            key: entry.name,
+            key: entry.userName,
             value: entry.delta,
         });
     }
@@ -169,6 +167,8 @@ function updateChart(round){
 
 function ChartManager(){
     // Roster of colors to color charts with
+    this.chart = null;
+    this.labelColorMap = {};
     this.COLORS = [
         'rgb(54, 162, 235)',
         'rgb(255, 99, 132)',
@@ -189,39 +189,58 @@ function ChartManager(){
     }
     
     this.plot = function(data){
-        let ctx = $('#resultsCanvas');
 
         // Build lists for displaying the bars
-        let keys = [];
+        let labels = [];
         let values = [];
         let backgroundColorList = [];
         let borderColorList = [];
 
         for (datum of data){
-            let color = this.getColor();
+            let color = this.labelColorMap[datum.key];
+            if (!color){
+                color = this.getColor();
+                this.labelColorMap[datum.key] = color;
+            }
 
-            keys.push(datum.key);
+            labels.push(datum.key);
             values.push(datum.value);
             backgroundColorList.push(color);
             borderColorList.push(this.transparentize(color));
         }
 
-        // build the actual chart
-        let chart = new Chart(ctx, {
+        // update chart data
+        this.chart.data.labels = labels;
+        this.chart.data.datasets[0].data = values;
+        this.chart.data.datasets[0].backgroundColor = backgroundColorList;
+        this.chart.data.datasets[0].borderColor = borderColorList;
+
+        this.chart.update();
+    }
+
+    this.init = function(canvasId){
+        // initialize the chart
+        let ctx = $('#'+canvasId);
+        this.chart = new Chart(ctx, {
             type: 'horizontalBar',
             data: {
-                labels: keys,
+                labels: [],
                 datasets: [{
-                    data: values,
-                    backgroundColor: backgroundColorList,
-                    borderColor: borderColorList,
+                    data: [],
+                    backgroundColor: [],
+                    borderColor: [],
                     borderWidth: 1,
                     minBarLength: 2,
                 }]
-            },
+            },                
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                title: {
+                    display: true,
+                    fontSize: 36,
+                    text: 'Buzz Times',
+                },
                 legend: {
                     display: false,
                 },
@@ -237,11 +256,15 @@ function ChartManager(){
                         },
                     }],
                 },
+                tooltips: {
+                    callbacks: {
+                        label: (item) => `${item.xLabel} ms`,
+                    },
+                },
             },
         });
     }
 }
-
 
 function playBuzzerNoise(){
     if (!muted){

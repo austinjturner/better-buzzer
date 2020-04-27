@@ -7,9 +7,14 @@ block page
       .buzzer-box
         .box#lightBox
         #button-bottom.button
+          #button-lockout(hidden)
+            svg(viewBox="0 0 60 30")
+              text(x="0" y="20") Too Early 
           button#button-top
-            img#i1(src='/images/buzzer-unpressed.svg' alt='Unpressed Buzzer' draggable='false')
-            img#i2(hidden src='/images/buzzer-pressed.svg' alt='Pressed Buzzer' draggable='false')
+            img#i1.button-unpressed(src='/images/buzzer-unpressed.svg' alt='Unpressed Buzzer' draggable='false')
+            img#i2.button-pressed(hidden src='/images/buzzer-pressed.svg' alt='Pressed Buzzer' draggable='false')
+            #i3.buzzer-text(hidden) Too Early
+
       
 
 

@@ -6,6 +6,7 @@ const WS_HOST_REGISTER_MSG = 'host-register';
 const WS_MEMBER_REGISTER_MSG = 'member-register';
 const WS_HOST_ACTIVE_MSG = 'host-active';
 const WS_HOST_FREEZE_MSG = 'host-freeze';
+const WS_HOST_RESET_MSG = 'host-reset';
 const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
 const WS_PAGE_UPDATE_MSG = 'page-update';
 const WS_REQUEST_PAGE_UPDATE_MSG = 'request-page-update';
@@ -29,39 +30,20 @@ function createLobby(){
     return lobbies[lobbyId];
 }
 
-
-
-// remove me
-/*function changeName(id, name){
-    if (lobbies[id]){
-        lobbies[id].name = name;
-    }    
-}*/
-
-/*function getMembers(id){
-    if (!lobbies[id]){
-        return [];
-    } else {
-        return lobbies[id].members;
-    }
-}
-
-function getHost(id){
-    if (!lobbies[id]){
-        return [];
-    } else {
-        return lobbies[id].host;
-    }  
-}*/
-
-function reset(id){
-    if (lobbies[id]){
-        lobbies[id].round = [];
+function reset(lobbyId){
+    if (lobbies[lobbyId]){
+        lobbies[lobbyId].round = [];
     }
 }
 
 function getLobbies(){
     return lobbies;
+}
+
+function getUserName(lobbyId, userId){
+    if (lobbies[lobbyId] && lobbies[lobbyId].members[userId]){
+        return lobbies[lobbyId].members[userId].userName;
+    }
 }
 
 function getLobbyById(lobbyId){
@@ -77,11 +59,11 @@ function setBuzzerActive(lobbyId, buzzerActive){
     }
 }
 
-
-function removeMember(lobbyId, memberId){
-    if (lobbies[lobbyId]){
-        delete lobbies[lobbyId].members[memberId];
+function removeMember(lobbyId, userId){
+    if (lobbies[lobbyId] && lobbies[lobbyId].members){
+        delete lobbies[lobbyId].members[userId];
     }
+    updateLobby(lobbyId);
 }
 
 function recordBuzz(lobbyId, userId, delta){
@@ -89,20 +71,58 @@ function recordBuzz(lobbyId, userId, delta){
         return;
     }
 
-
     // TODO improve order
     lobbies[lobbyId].round.push({
         userId: userId,
+        userName: getUserName(lobbyId, userId),
         delta: delta,
     });
+
+    sortRound(lobbyId);
 }
 
-/*
-function getResults(lobbyId){
-    if (lobbies[lobbyId]){
-        return lobbies[lobbyId].round;
+function sortRound(lobbyId){
+    if (!lobbies[lobbyId]) return;
+    var round = lobbies[lobbyId].round;
+
+    // sort by response times first
+    round.sort((a, b) => {
+        return a.delta - b.delta;
+    })
+
+    // find people with the same response time, then shuffle
+    var start = 0, end;
+    while (start < round.length){
+        var end = start;
+        while(end + 1 < round.length && (round[start].delta == round[end + 1].delta)){
+            end++;
+        }
+        shuffleSubArray(round, start, end);
+
+        start = end + 1;
     }
-}*/
+}
+
+// shuffle between array[start:end], inclusive
+function shuffleSubArray(array, start, end) {
+    var m = end - start + 1, t, i;
+
+    if (m <= 1) return; // nothing to do here
+  
+    // While there remain elements to shuffle…
+    while (m) {
+  
+      // Pick a remaining element…
+      i = start + Math.floor(Math.random() * m--);
+  
+      // And swap it with the current element.
+      t = array[m];
+      array[m] = array[i];
+      array[i] = t;
+    }
+  
+    //return array;
+  }
 
 function setLobbyHost(lobbyId, userId, userName, ws){
     if (!lobbies[lobbyId]) return;
@@ -133,6 +153,10 @@ function addMemberToLobby(lobbyId, userId, userName, ws){
 
 // Do NOT copy websockets
 function copyLobby(lobby){
+    if (!lobby) {
+        return console.error('No data');
+    };
+
     let copy = {
         lobbyId: lobby.lobbyId,
         buzzerActive: lobby.buzzerActive,
@@ -243,6 +267,25 @@ function handleUpdateUser(ws, data){
     updateUser(lobbyId, ws);
 }
 websocket.registerMessageHander(WS_REQUEST_PAGE_UPDATE_MSG, handleUpdateUser);
+
+function resetBuzzerHandler(ws, data){
+    let lobbyId = data.lobbyId;
+
+    reset(lobbyId);
+    updateLobby(lobbyId);
+}
+websocket.registerMessageHander(WS_HOST_RESET_MSG, resetBuzzerHandler);
+
+
+function handleClose(ws){
+    if(ws.userId) {
+        // should we check the host?
+        for (lobbyId in lobbies){
+            removeMember(lobbyId, ws.userId);
+        }
+    }
+}
+websocket.registerCloseHandler(handleClose);
 
 module.exports = {
     getLobbies,
