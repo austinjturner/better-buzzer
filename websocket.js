@@ -1,4 +1,6 @@
 
+const PING_INTERVAL_MS = 1000;
+
 var messageHandlers = {};
 var closeHandlers = [];
 
@@ -20,6 +22,10 @@ function initializeWebsocketServer(server){
             handleClose(ws);
             ws.terminate();
         });
+
+        ws.timer = setInterval(() => {
+            ws.ping();
+        }, PING_INTERVAL_MS);
     });
 }
 
