@@ -1,4 +1,6 @@
 
+const SM_SCREEN_BREAKPOINT = 768; 
+
 const WS_HOST_REGISTER_MSG = 'host-register';
 const WS_HOST_NAME_MSG = 'host-name';
 const WS_MEMBER_LIST_MSG = 'member-list';
@@ -20,6 +22,7 @@ let muted = false;
 
 $(() => {
     chartManager.init('resultsCanvas');
+    chartManager.init('resultsCanvasBottom');
 
     var lobbyId = getLobbyId();
     if (!getCookie(lobbyId)){
@@ -44,7 +47,6 @@ $(() => {
         muted = !$(this).prop('checked');
     })
 
-
     $('#'+chooseNameModalId).on('shown.bs.modal', function (e) {
         $(`#${chooseNameModalId} input[type="text"]`)[0].select();
     });
@@ -62,8 +64,8 @@ $(() => {
         
         // close right panel
         setRightPanel(false);
+        setBottomPanel(false);
     });
-
 
     $('#sidebarRightCollapse').on('click', function () {
         setRightPanel(true);
@@ -72,9 +74,19 @@ $(() => {
         setLeftPanel(false);
     });
 
+    $('#collapseExampleButton').click(() => {
+        setLeftPanel(false);
+    });
+
     $('#dismiss').on('click', function () {
         setRightPanel(false);
     });
+
+    if (screen.width > SM_SCREEN_BREAKPOINT){
+        $('#collapseExampleButton').hide();
+    } else {
+        $('#sidebarRightCollapse').hide();
+    }
 
     // Open websocket
     initWebsocket(window.location.hostname);
@@ -95,7 +107,17 @@ function setRightPanel(visible){
     }
 }
 
+function setBottomPanel(visible){
+    if (visible){
+        $('#collapseExample').collapse('show');
+    } else {
+        $('#collapseExample').collapse('hide');
+    }
+}
+
 function setLeftPanel(visible){
+    if (screen.width < SM_SCREEN_BREAKPOINT) visible = !visible;
+
     if (visible){
         $('#sidebar').removeClass('active');
         $('#sidebarCollapse').removeClass('active');
@@ -104,7 +126,6 @@ function setLeftPanel(visible){
         $('#sidebarCollapse').addClass('active');
     }
 }
-
 
 function updatePage(data){
     // update the lobby panel
@@ -154,6 +175,22 @@ function openRightCollapse(){
     $('#sidebarRightCollapse').click();
 }
 
+function openBottomCollapse(){
+    $('#collapseExampleButton').click();
+}
+
+function closeRightCollapse(){
+    $('#dismiss').click();
+}
+
+function openChart(){
+    if (screen.width < SM_SCREEN_BREAKPOINT){
+        openBottomCollapse();
+    } else {
+        openRightCollapse();
+    }
+}
+
 function updateChart(round){
     let data = [];
     for (entry of round){
@@ -167,7 +204,7 @@ function updateChart(round){
 
 function ChartManager(){
     // Roster of colors to color charts with
-    this.chart = null;
+    this.charts = [];
     this.labelColorMap = {};
     this.COLORS = [
         'rgb(54, 162, 235)',
@@ -189,39 +226,40 @@ function ChartManager(){
     }
     
     this.plot = function(data){
+        for (chart of this.charts){
+            // Build lists for displaying the bars
+            let labels = [];
+            let values = [];
+            let backgroundColorList = [];
+            let borderColorList = [];
 
-        // Build lists for displaying the bars
-        let labels = [];
-        let values = [];
-        let backgroundColorList = [];
-        let borderColorList = [];
+            for (datum of data){
+                let color = this.labelColorMap[datum.key];
+                if (!color){
+                    color = this.getColor();
+                    this.labelColorMap[datum.key] = color;
+                }
 
-        for (datum of data){
-            let color = this.labelColorMap[datum.key];
-            if (!color){
-                color = this.getColor();
-                this.labelColorMap[datum.key] = color;
+                labels.push(datum.key);
+                values.push(datum.value);
+                backgroundColorList.push(color);
+                borderColorList.push(this.transparentize(color));
             }
 
-            labels.push(datum.key);
-            values.push(datum.value);
-            backgroundColorList.push(color);
-            borderColorList.push(this.transparentize(color));
+            // update chart data
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = values;
+            chart.data.datasets[0].backgroundColor = backgroundColorList;
+            chart.data.datasets[0].borderColor = borderColorList;
+
+            chart.update();
         }
-
-        // update chart data
-        this.chart.data.labels = labels;
-        this.chart.data.datasets[0].data = values;
-        this.chart.data.datasets[0].backgroundColor = backgroundColorList;
-        this.chart.data.datasets[0].borderColor = borderColorList;
-
-        this.chart.update();
     }
 
     this.init = function(canvasId){
         // initialize the chart
         let ctx = $('#'+canvasId);
-        this.chart = new Chart(ctx, {
+        this.charts.push(new Chart(ctx, {
             type: 'horizontalBar',
             data: {
                 labels: [],
@@ -238,7 +276,7 @@ function ChartManager(){
                 maintainAspectRatio: false,
                 title: {
                     display: true,
-                    fontSize: 36,
+                    fontSize: screen.width > SM_SCREEN_BREAKPOINT ? 36 : 14,
                     text: 'Buzz Times',
                 },
                 legend: {
@@ -262,7 +300,7 @@ function ChartManager(){
                     },
                 },
             },
-        });
+        }));
     }
 }
 

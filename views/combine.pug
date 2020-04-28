@@ -10,7 +10,7 @@ block content
     nav#sidebar.bg-light
       .sidebar-header.bg-light
         .d-flex.flex-column.bd-highlight.mb-3
-          .mb-auto.p-2.bd-highlight
+          p-2.bd-highlight
             h1 Lobby
             hr
             h4 Host
@@ -18,10 +18,11 @@ block content
               .spinner-grow.spinner-grow-sm(role='status')
                 span.sr-only Loading...
             hr
+          p-2.bd-highlight
             h4 Members
             ul#memberList.list-group.list-group-flush
               li.list-group-item.list-group-item-dark No members
-          .mt-auto.p-2.bd-highlight
+          .mt-auto.p-2.bd-highlight#sidebar-right-footer
             span
               input#soundToggle.float-bottom(type='checkbox' checked='' data-width='100%' data-toggle='toggle' data-on="Sound On" data-off="Sound Off")
     #content
@@ -36,6 +37,18 @@ block content
       button#sidebarRightCollapse.btn.btn-danger
         i.fas.fa-chart-bar
       block page
+      #footer
+        #collapseExample.collapse
+          .card.card-body
+            .d-flex.flex-column.bd-highlight.mb-3.align-items-center
+              .p-2.bd-highlight
+                #dismissBottom.btn.btn-primary(type='button', data-toggle='collapse', data-target='#collapseExample', aria-expanded='false', aria-controls='collapseExample')
+                  i.fas.fa-arrow-down
+              .p-2.bd-highlight#canvasContainerBottom.flex-fill
+                canvas#resultsCanvasBottom     
+        a#collapseExampleButton.hide-me.btn.btn-danger(data-toggle='collapse', href='#collapseExample', role='button', aria-expanded='false', aria-controls='collapseExample')
+          i.fas.fa-chart-bar
+
     nav#sidebar-right.bg-light.active
       .d-flex.flex-row.bd-highlight.mb-3.align-items-center
         .p-2.bd-highlight

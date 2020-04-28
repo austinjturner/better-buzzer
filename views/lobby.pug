@@ -3,17 +3,17 @@ extends combine
 block page
   script(src='/javascripts/lobby.js')
   .container
-    .container.page-item
+    .container.page-itemn.selectDisable
       .buzzer-box
         .box#lightBox
-        #button-bottom.button
+        #button-bottom.button.selectDisable
           #button-lockout(hidden)
             svg(viewBox="0 0 60 30")
               text(x="0" y="20") Too Early 
           button#button-top
-            img#i1.button-unpressed(src='/images/buzzer-unpressed.svg' alt='Unpressed Buzzer' draggable='false')
-            img#i2.button-pressed(hidden src='/images/buzzer-pressed.svg' alt='Pressed Buzzer' draggable='false')
-            #i3.buzzer-text(hidden) Too Early
+            img.selectDisable#i1.button-unpressed(src='/images/buzzer-unpressed.svg' alt='Unpressed Buzzer' draggable='false')
+            img.selectDisable#i2.button-pressed(hidden src='/images/buzzer-pressed.svg' alt='Pressed Buzzer' draggable='false')
+          #i3.selectDisable.buzzer-text(hidden) Too Early
 
       
 

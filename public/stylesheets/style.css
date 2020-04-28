@@ -5,6 +5,22 @@ html, body {
   overflow: hidden;
 }
 
+.selectDisable {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.selectEnable { 
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -o-user-select: text;
+  user-select: text;
+}
+
 .modal, .modal-dialog {
   overflow-y: hidden;
 }
@@ -18,8 +34,6 @@ a {
   color: #00B7FF;
   padding: 10px;
 }
-
-
 
 .box {
   margin:50px;
@@ -66,6 +80,19 @@ a {
   height: auto;
 }
 
+.scroll-flow {
+  overflow-y: auto;
+}
+
+#memberList{
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.list-group-item-dark{
+  word-wrap: break-word;
+}
+
 .page-item{
   margin-left: 0;
   margin-right: 0;
@@ -81,8 +108,6 @@ a {
 #sidebar {
   min-width: 250px;
   max-width: 250px;
-  min-height: 100vh;
-  /*background: #7386D5;*/
   transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
   transform-origin: center left; /* Set the transformed position of sidebar to center left side. */
 }
@@ -136,18 +161,184 @@ a {
   width: 100%;
 }
 
+#sidebarRightCollapse {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  font-size: 30px;
+}
+
+#sidebar-right {
+  min-width: 750px;
+  max-width: 750px;
+  min-height: 100vh;
+  transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+  transform-origin: center right; /* Set the transformed position of sidebar to center left side. */
+}
+
+#sidebar-right-footer{
+  position: relative;
+}
+
+#soundToggle{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+
+}
+
+#sidebar-right.active {
+  margin-right: -750px;
+  transform: rotateY(100deg); /* Rotate sidebar vertically by 100 degrees. */
+}
+
+#sidebar-right .sidebar-header {
+  padding: 20px;
+}
+
+#sidebar-right .d-flex {
+  height: 100%;
+}
+
+#dismiss {
+  font-size: 20px;
+}
+
+#canvasContainer{
+  height: 70%;
+}
+
+#button-bottom{
+  position: relative;
+  background: #c0392b;
+  height: calc(36vh + (1 - 0.81081) * 30vh);
+  width: 60%;
+  border-radius: 25px;
+  margin: 0 20% 0 20%;
+  text-align:center;
+}
+
+#button-top{
+  background: #c0392b;
+  position: absolute;
+  outline: none;
+  border: none;
+  margin-top: 3vh;
+  height: 30vh;
+  width: 30vh;
+  margin-left: calc(-15vh * 0.81081);
+}
+
+.button-unpressed {
+  position: absolute;
+  max-width:100%;
+  max-height:100%;
+  bottom: 0;
+  left: 0;
+}
+
+.button-pressed{
+  position: absolute;
+  max-width: 81.081%;
+  max-height: 81.081%;
+  bottom: 0;
+  left: 0;
+}
+
+#sidebar .sidebar-header {
+  height: 100%;
+}
+
+#sidebar .d-flex {
+  height: 100%; 
+}
+
+.buzzer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: xx-large;
+}
+
+
+#footer{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+#collapseExample .card {
+  margin: 0;
+  padding: 0;
+}
+
+
+.hide-me[aria-expanded="true"] {
+  display: none;
+}
+
+
+#collapseExampleButton{
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  font-size: 30px;
+}
+
+#dismissBottom{
+  font-size: 25px;
+}
+
+#canvasContainerBottom{
+  height: 40vh;
+  width: 100vw;
+}
+
+#collapseBottom{
+  height: 50vh;
+}
+
+#bottomCollapseButton{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
 @media (max-width: 768px) {
+  .page-item{
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 5%;
+    margin-bottom: 5%;
+  }
+
+  .navbar-brand{
+    display: none;
+  }
+
   /* Reversing the behavior of the sidebar: 
      it'll be rotated vertically and off canvas by default, 
      collapsing in on toggle button click with removal of 
      the vertical rotation.   */
   #sidebar {
-      margin-left: -250px;
+      min-width: 50vw;
+      max-width: 50vw;
+      margin-left: -50vw;
       transform: rotateY(100deg);
   }
   #sidebar.active {
       margin-left: 0;
       transform: none;
+  }
+
+  #sidebar-right-footer{
+    margin-bottom: 20%;
   }
 
   /* Reversing the behavior of the bars: 
@@ -175,100 +366,44 @@ a {
   #sidebarCollapse.active span:last-of-type {
       transform: rotate(-45deg) translate(1px, -1px);
   }
-}
 
+  .buzzer-box{
+    margin-top: 10px;
+  }
 
+  #button-bottom{
+    position: relative;
+    height: calc(26vh + (1 - 0.81081) * 24vh);
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
 
-#sidebar-right {
-  min-width: 750px;
-  max-width: 750px;
-  min-height: 100vh;
-  /*background: #7386D5;*/
-  transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
-  transform-origin: center right; /* Set the transformed position of sidebar to center left side. */
-}
+  #button-top{
+    position: absolute;
+    margin-top: 1vh;
+    height: 24vh;
+    width: 24vh;
+    margin-left: calc(-12vh * 0.81081)
+  }
 
-#sidebar-right.active {
-  margin-right: -750px;
-  transform: rotateY(100deg); /* Rotate sidebar vertically by 100 degrees. */
-}
+  #sidebarRightCollapse{
+    position: absolute;
+    right: 1000vw;
+  }
 
-#sidebar-right .sidebar-header {
-  padding: 20px;
-}
-
-#sidebar-right .d-flex {
-  height: 100%;
-}
-
-#dismiss {
-  font-size: 20px;
-}
-
-#sidebarRightCollapse {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  transform: translateY(-50%);
-  font-size: 30px;
-}
-
-#canvasContainer{
-  height: 70%;
-}
-
-#button-bottom{
-  position: relative;
-  background: #c0392b;
-  height: 36vh;
-  width: 60%;
-  border-radius: 25px;
-  margin: 0 20% 0 20%;
-  text-align:center;
-}
-
-
-#button-top{
-  background: #c0392b;
-  outline: none;
-  border: none;
-  margin-top: 9vh;
-  height: 18vh;
-  width: 18vh;
-  position: relative;
-}
-
-.button-unpressed {
-  position: absolute;
-  max-width:100%;
-  max-height:100%;
-  bottom: 0;
-  left: 0;
-}
-
-.button-pressed{
-  position: absolute;
-  max-width: 81.081%;
-  max-height: 81.081%;
-  bottom: 0;
-  left: 0;
-}
-
-
-#sidebar .sidebar-header {
-  height: 100%;
-}
-
-#sidebar .d-flex {
-  height: 100%; 
-}
-
-.buzzer-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: xx-large;
+  .box {
+    margin: 0 0 10px 0;
+    width: 80%;
+    height: 4vh;
+  }
+  
+  .box-on {
+    margin: 0 0 10px 0;
+    width: 80%;
+    height: 4vh;
+    background:#ff0000;
+    box-shadow: 0 0 20px #fff;
+  }
 }
 

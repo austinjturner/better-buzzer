@@ -6,7 +6,7 @@ const WS_MEMBER_FREEZE_MSG = 'member-freeze';
 const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
 const WS_BUZZER_RESULTS_MSG = 'buzzer-results';
 
-const TOO_SOON_PENALTY_MS = 500;
+const TOO_SOON_PENALTY_MS = 1000;
 
 var buzzerState = {
     indicator: false,
@@ -28,7 +28,7 @@ $(() => {
         handleBuzzerClick();
     })
 
-    $('#button-top').mousedown(() => {
+    $('#button-top').on('mousedown touchstart', () => {
         if (buzzerState.locked) return;
 
         $('#i1').attr('hidden', true);
@@ -36,7 +36,7 @@ $(() => {
         handleBuzzerClick();
     })
 
-    $(document).mouseup(() => {
+    $(document).on('mouseup touchend', () => {
         if (buzzerState.locked) return;
 
         $('#i1').attr('hidden', false);
@@ -91,6 +91,7 @@ function activeBuzzer(){
 
 function freezeBuzzer(){
     buzzerState.indicator = false;
+    buzzerState.disabled = false;
     $('#lightBox').removeClass('box-on');
 }
 
@@ -132,7 +133,7 @@ function handleBuzzerClick(){
             delta: delta,
         })
 
-        openRightCollapse();
+        openChart();
     } else {
         // too soon penalty
         buzzerState.disabled = true;

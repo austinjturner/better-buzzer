@@ -72,7 +72,7 @@ function updateHostPage(data){
     // detect the first buzz
     if (pageCache.round && pageCache.round.length == 0 && data.round.length > 0){
         playBuzzerNoise();
-        openRightCollapse();
+        openChart()
     }
 
     pageCache = data;
