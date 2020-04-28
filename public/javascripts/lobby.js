@@ -43,6 +43,11 @@ $(() => {
         $('#i2').attr('hidden', true);
     })
 
+    // disable right clicks on buzzer
+    $('.selectDisable').bind('contextmenu', function(e) {
+        return false;
+    }); 
+
     document.addEventListener(WS_PAGE_UPDATE_MSG, function(e) {
         var data = e.detail;  // the "data" from the server is here
         updateLobbyPage(data);
