@@ -24,7 +24,7 @@
 #buzzerBottom{
   position: relative;
   background: #c0392b;
-  height: calc(36vh + (1 - 0.81081) * 30vh);
+  height: 36vh;
   width: 60%;
   border-radius: 25px;
   margin: 0 20% 0 20%;
@@ -36,26 +36,16 @@
   position: absolute;
   outline: none;
   border: none;
-  margin-top: 3vh;
-  height: 30vh;
-  width: 30vh;
-  margin-left: calc(-15vh * 0.81081);
+  width: 60%;
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translateY(-50%) translateX(-50%);
+  transform: translateY(-50%)  translateX(-50%);
 }
-  
-#buzzerButtonUnpressed {
-  position: absolute;
-  max-width:100%;
-  max-height:100%;
-  bottom: 0;
-  left: 0;
-}
-  
-#buzzerButtonPressed {
-  position: absolute;
-  max-width: 81.081%;
-  max-height: 81.081%;
-  bottom: 0;
-  left: 0;
+
+#buzzerTop img {
+  width: 100%;
 }
 
 #buzzerLockoutText {
@@ -87,18 +77,9 @@
   }
 
   #buzzerBottom{
-    position: relative;
-    height: calc(26vh + (1 - 0.81081) * 24vh);
+    height: 26vh;
     width: 100%;
     border-radius: 0;
     margin: 0;
-  }
-
-  #buzzerTop{
-    position: absolute;
-    margin-top: 1vh;
-    height: 24vh;
-    width: 24vh;
-    margin-left: calc(-12vh * 0.81081)
   }
 }
