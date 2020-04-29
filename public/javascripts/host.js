@@ -1,68 +1,85 @@
 
+// cache that holds a copy of the latest page data
 var pageCache = {};
 
+// 
+// HTML id tags
+// 
+const buzzerActiveToggleId = 'buzzerActiveToggle';
+const linkTextId = 'linkText';
+const linkCopyButtonId = 'linkCopyButton';
+const buzzerResetButtonId = 'buzzerResetButton';
+
+// On load
 $( document ).ready(() => {
-    $('#toggle').bootstrapToggle({
+    
+    // update link text for this page
+    $('#'+linkTextId).val(window.location.origin + $('#'+linkTextId).val());
+    
+    // initialize the activate button toggle
+    $('#'+buzzerActiveToggleId).bootstrapToggle({
         on: 'Active',
         off: 'Frozen',
         size: 'large',
     });
-    $('#toggle').bootstrapToggle('off');
+    // toggle start 'off'
+    $('#'+buzzerActiveToggleId).bootstrapToggle('off');
 
-    $('#toggle').change(function() {
-        if ($('#toggle').prop('checked')){
+    init();
+    
+    //
+    // Resigter listeners
+    //
+
+    // Event listener to display new page data
+    document.addEventListener(WS_PAGE_UPDATE_MSG, function(e) {
+        var data = e.detail;  // the "data" from the server is here
+        updateHostPage(data);
+    });
+
+    // Listener for toggle button press
+    $('#'+buzzerActiveToggleId).change(function() {
+        if ($('#'+buzzerActiveToggleId).prop('checked')){
             sendWsMessage(WS_HOST_ACTIVE_MSG, {lobbyId: getLobbyId()});
         } else {
             sendWsMessage(WS_HOST_FREEZE_MSG, {lobbyId: getLobbyId()});
         }
     })
 
-    $("#nameText").change(function(){
-        sendWsMessage(WS_HOST_NAME_MSG, {
-            lobbyId: getLobbyId(),
-            name: $('#nameText').val()
-        });
-    });
-
-    // update link text for this page
-    $('#linkText').val(window.location.origin + $('#linkText').val());
-    
-
-    $("#copyBtn").off("click");
-    $('#copyBtn').click(e => {
-        $('#linkText').select();
+    // Listener for copy link button
+    $("#"+linkCopyButtonId).off("click");
+    $('#'+linkCopyButtonId).click(e => {
+        $('#'+linkTextId).select();
         document.execCommand("copy");
         window.getSelection().removeAllRanges();
     });
 
-    $('#resetButton').click(e => {
+    // Listener for reset button
+    $('#'+buzzerResetButtonId).click(e => {
         // simulate reset by flipping button twice
-        let active = $('#toggle').prop('checked');
+        let active = $('#'+buzzerActiveToggleId).prop('checked');
         if (active) sendWsMessage(WS_HOST_FREEZE_MSG, {lobbyId: getLobbyId()});
         sendWsMessage(WS_HOST_ACTIVE_MSG, {lobbyId: getLobbyId()});
         if (!active) sendWsMessage(WS_HOST_FREEZE_MSG, {lobbyId: getLobbyId()});
     });
 
-    document.addEventListener(WS_PAGE_UPDATE_MSG, function(e) {
-        var data = e.detail;  // the "data" from the server is here
-        updateHostPage(data);
-    });
-
-    init();
 })
 
-
+// Initialize host once we have the host's name
 function init(){
     var lobbyId = getLobbyId();
 
+    // If no name cookie, initialize later...
     if (!getCookie(lobbyId)){
         document.addEventListener('name-set', function(e) {
             init();
         });
         return;
     }
+
+    // Register me via WebSocket
     sendWsMessage(WS_HOST_REGISTER_MSG, {
-        userId: getCookieValue(ID_COOKIE),
+        userId: getCookie(ID_COOKIE),
         lobbyId: lobbyId, 
         userName: getName(),
     });
@@ -75,5 +92,6 @@ function updateHostPage(data){
         openChart()
     }
 
+    // update cache
     pageCache = data;
 }

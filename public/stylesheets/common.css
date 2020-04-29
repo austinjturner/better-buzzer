@@ -1,0 +1,239 @@
+
+.wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+#content {
+  width: 100%;
+}  
+
+#footer{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+#soundToggle{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+
+.pageItem{
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+#memberList{
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.list-group-item-dark{
+  word-wrap: break-word;
+}
+
+/* 
+ * Left Sidebar Styling 
+ */
+
+#sidebarLeftCollapse {
+  min-width: 250px;
+  max-width: 250px;
+  transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+  transform-origin: center left; 
+}
+
+#sidebarLeftCollapse.active {
+  margin-left: -250px;
+  transform: rotateY(100deg); 
+}
+
+#sidebarLeftCollapse .sidebar-header {
+  padding: 20px;
+  height: 100%;
+}
+
+#sidebarLeftCollapse .d-flex {
+  height: 100%; 
+}
+
+#sidebarLeftCollapseButton {
+  width: 40px;
+  height: 40px;
+  border: 0;
+}
+
+#sidebarLeftCollapseButton span {
+  width: 80%;
+  height: 2px;
+  margin: 0 auto;
+  display: block;
+  background: #555;
+  transition: all 0.8s cubic-bezier(0.810, -0.330, 0.345, 1.375);
+}
+
+#sidebarLeftCollapseButton span:first-of-type {
+  transform: rotate(45deg) translate(2px, 2px);
+}
+
+#sidebarLeftCollapseButton span:nth-of-type(2) {
+  opacity: 0;
+}
+
+#sidebarLeftCollapseButton span:last-of-type {
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+#sidebarLeftCollapseButton.active span {
+  transform: none;
+  opacity: 1;
+  margin: 5px auto;
+}
+
+/* 
+ * Right Sidebar Styling 
+ */
+
+#sidebarRightCollapse {
+  min-width: 750px;
+  max-width: 750px;
+  min-height: 100vh;
+  transition: all 0.6s cubic-bezier(0.945, 0.020, 0.270, 0.665);
+  transform-origin: center right;
+}
+
+#sidebarRightCollapse.active {
+  margin-right: -750px;
+  transform: rotateY(100deg);
+}
+  
+#sidebarRightCollapse .sidebar-header {
+  padding: 20px;
+}
+  
+#sidebarRightCollapse .d-flex {
+  height: 100%;
+}
+
+#sidebarRightCollapseButton {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  font-size: 30px;
+}
+  
+#sidebarRightCollapseDismiss {
+  font-size: 20px;
+}
+
+#sidebarRightFooter{
+  position: relative;
+}
+
+/* 
+ * Bottom Sidebar Styling 
+ */
+ 
+#sidebarBottomCollapse .card {
+  margin: 0;
+  padding: 0;
+}
+
+#sidebarBottomCollapseButton{
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+  font-size: 30px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#sidebarBottomCollapseDismiss{
+  font-size: 25px;
+}
+
+/* 
+ * Chart Styling 
+ */
+  
+#canvasContainerRight{
+  height: 70%;
+}
+
+#canvasContainerBottom{
+  height: 40vh;
+  width: 100vw;
+}
+
+/* Styling specific to small screens */
+@media (max-width: 768px) {
+  .pageItem{
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 5%;
+    margin-bottom: 5%;
+  }
+
+  .navbar-brand{
+    display: none;
+  }
+
+  /* 
+  * Left Sidebar Styling
+  */
+
+  #sidebarLeftCollapse {
+    min-width: 50vw;
+    max-width: 50vw;
+    margin-left: -50vw;
+    transform: rotateY(100deg);
+  }
+
+  #sidebarLeftCollapse.active {
+      margin-left: 0;
+      transform: none;
+  }
+
+  #sidebarLeftCollapseButton span:first-of-type,
+  #sidebarLeftCollapseButton span:nth-of-type(2),
+  #sidebarLeftCollapseButton span:last-of-type {
+      transform: none;
+      opacity: 1;
+      margin: 5px auto;
+  }
+
+  #sidebarLeftCollapseButton.active span {
+      margin: 0 auto;
+  }
+  #sidebarLeftCollapseButton.active span:first-of-type {
+      transform: rotate(45deg) translate(2px, 2px);
+  }
+  #sidebarLeftCollapseButton.active span:nth-of-type(2) {
+      opacity: 0;
+  }
+  #sidebarLeftCollapseButton.active span:last-of-type {
+      transform: rotate(-45deg) translate(1px, -1px);
+  }
+
+  /* 
+   * Right Sidebar Styling 
+   */
+
+  #sidebarRightCollapseButton{
+    position: absolute;
+    right: 1000vw;
+  }
+
+  #sidebarRightFooter{
+    margin-bottom: 20%;
+  }
+}

@@ -1,4 +1,8 @@
-
+/*
+ * These functions provide an interface for other modules to access the websockets
+ * 
+ * Handlers can be registered for different message types and on websocket close events
+ */
 const PING_INTERVAL_MS = 1000;
 
 var messageHandlers = {};
@@ -60,9 +64,18 @@ function handleMessage(ws, messageString){
     }
 }
 
+// Push a WebSocket message 
+function send(ws, type, data){
+    ws.send(JSON.stringify({
+        type,
+        data,
+    }));
+}
+
 
 module.exports = {
     initializeWebsocketServer,
     registerMessageHander,
     registerCloseHandler,
+    send,
 }

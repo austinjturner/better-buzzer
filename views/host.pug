@@ -1,19 +1,20 @@
-extends combine
+extends common
 
 block page
   script(src='/javascripts/host.js')
+  link(rel='stylesheet', href='/stylesheets/host.css')
   .container
-    .container.page-item
+    .container.pageItem
       h3.text-light Enable Buzzer
-      input#toggle(type='checkbox' checked='' data-toggle='toggle' data-width='100%' data-height='75' data-on="Active" data-off="Frozen" data-offstyle="secondary")
-    .container.page-item
+      input#buzzerActiveToggle(type='checkbox' checked='' data-toggle='toggle' data-width='100%' data-height='75' data-on="Active" data-off="Frozen" data-offstyle="secondary")
+    .container.pageItem
       h3.text-light Reset Buzzer
-        button#resetButton.btn.btn-primary.btn-lg.btn-block(type='button') Reset
-    .container.page-item
+        button#buzzerResetButton.btn.btn-primary.btn-lg.btn-block(type='button') Reset
+    .container.pageItem
       h3.text-light Add Members
       p.text-light Members can join at the link
       .input-group.mb-3
         .input-group-prepend
-            button#copyBtn.btn.btn-primary(type='button')
+            button#linkCopyButton.btn.btn-primary(type='button')
               i.fas.fa-copy
         input#linkText.form-control(type='text' value='/lobby/'+lobbyId readonly='')

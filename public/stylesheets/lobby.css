@@ -1,0 +1,104 @@
+.buzzerBox{
+  height: 100%;
+  background-color: #333;
+  text-align: center;
+}
+
+.indicatorNotActive {
+  margin:50px;
+  width: 15vh;
+  height: 15vh;
+  border-radius:50px;
+  background:#630808;
+  display: inline-block;
+}
+  
+.indicatorActive {
+  margin:50px;
+  width: 15vh;
+  height: 15vh;
+  background:#ff0000;
+  box-shadow: 0 0 20px #fff;
+}
+
+#buzzerBottom{
+  position: relative;
+  background: #c0392b;
+  height: calc(36vh + (1 - 0.81081) * 30vh);
+  width: 60%;
+  border-radius: 25px;
+  margin: 0 20% 0 20%;
+  text-align:center;
+}
+  
+#buzzerTop{
+  background: #c0392b;
+  position: absolute;
+  outline: none;
+  border: none;
+  margin-top: 3vh;
+  height: 30vh;
+  width: 30vh;
+  margin-left: calc(-15vh * 0.81081);
+}
+  
+#buzzerButtonUnpressed {
+  position: absolute;
+  max-width:100%;
+  max-height:100%;
+  bottom: 0;
+  left: 0;
+}
+  
+#buzzerButtonPressed {
+  position: absolute;
+  max-width: 81.081%;
+  max-height: 81.081%;
+  bottom: 0;
+  left: 0;
+}
+
+#buzzerLockoutText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: xx-large;
+}
+
+
+@media (max-width: 768px) {
+  .buzzerBox{
+    margin-top: 10px;
+  }
+
+  .indicatorNotActive {
+    margin: 0 0 10px 0;
+    width: 80%;
+    height: 4vh;
+  }
+  
+  .indicatorActive {
+    margin: 0 0 10px 0;
+    width: 80%;
+    height: 4vh;
+    background:#ff0000;
+    box-shadow: 0 0 20px #fff;
+  }
+
+  #buzzerBottom{
+    position: relative;
+    height: calc(26vh + (1 - 0.81081) * 24vh);
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  #buzzerTop{
+    position: absolute;
+    margin-top: 1vh;
+    height: 24vh;
+    width: 24vh;
+    margin-left: calc(-12vh * 0.81081)
+  }
+}

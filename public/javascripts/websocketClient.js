@@ -4,7 +4,7 @@ const ID_COOKIE = 'buzzerId';
 var socket;
 
 // TODO remove param
-function initWebsocket(hostname){
+function initWebsocket(){
     if (socket) {
         console.error(`Trying to reopen websocket`);
         return;
@@ -13,11 +13,12 @@ function initWebsocket(hostname){
     // Determine whether to use SSL or not
     const protocol = location.protocol == 'http:' ? 'ws://' : 'wss://';
 
+    const hostname = window.location.hostname;
     const socketURL = `${protocol}${hostname}:${location.port}`
 
     socket = new WebSocket(socketURL);
     socket.onopen = e => {
-        //sendWsMessage('ws-auth-request', {token});
+
     }
 
     socket.onmessage = event => {
@@ -39,7 +40,7 @@ function initWebsocket(hostname){
         socket = null;
         console.log('Socket is closed. Reconnect will be attempted in 1 second.', event.reason);
         setTimeout(function() {
-            initWebsocket(hostname);
+            initWebsocket();
         }, 1000);
     }
 
@@ -50,13 +51,8 @@ function initWebsocket(hostname){
 }
 
 function sendWsMessage(type, data){
-    var messageWaitTime = socket.readyState == WebSocket.CONNECTING ? 300 : 0;
+    var messageWaitTime = socket.readyState == WebSocket.CONNECTING ? 500 : 0;
     setTimeout(()=>{
         socket.send(JSON.stringify({type, data}));
     }, messageWaitTime)
-}
-
-function getCookieValue(a) {
-    var b = document.cookie.match('(^|[^;]+)\\s*' + a + '\\s*=\\s*([^;]+)');
-    return b ? b.pop() : '';
 }

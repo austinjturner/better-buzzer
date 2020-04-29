@@ -1,65 +1,59 @@
-
-const ID_COOKIE = 'buzzerId';
-const title = 'Better Buzzer';
+/*
+ * Router to handle all html/pug pages
+ */
 
 var express = require('express');
-var lobby = require('../lobbyManager');
-var utils = require('../utils');
+var lobby = require('../utils/lobbyManager');
 var router = express.Router();
+
+const title = 'Better Buzzer';
+
+/* Middleware to check for lobbyId not found */
+function checkLobbyId(req, res, next){
+  var lobbyId = req.params.lobbyId;
+  if (lobbyId && !lobby.lobbyIdExists(lobbyId)) {
+    res.render('404', { 
+      title,
+      message: 'Lobby Not Found',
+    });
+  } else {
+    next();
+  }
+}
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  setCookie(req, res);
   res.render('index', { title });
 });
 
-/* GET host page. */
+/* GET host redirect page. */
 router.get('/host', function(req, res, next) {
-  setCookie(req, res);
-
   var newLobby = lobby.createLobby();
   res.redirect('/host/'+newLobby.lobbyId);
 });
 
-router.get('/host/:id', function(req, res, next) {
+/* GET host page */
+router.get('/host/:lobbyId', checkLobbyId, function(req, res, next) {
   res.render('host', { 
     title,
-    lobbyId: req.params.id,
-  });
-});
-
-/* GET join page. */
-router.get('/join', function(req, res, next) {
-  setCookie(req, res);
-
-  var lobbyMap = lobby.getLobbies();
-  var lobbyList = [];
-  for (var key in lobbyMap){
-    lobbyList.push(lobbyMap[key]);
-  }
-
-  res.render('join', { 
-    title,
-    lobbyList: lobbyList,
+    lobbyId: req.params.lobbyId,
   });
 });
 
 /* GET lobby page. */
-router.get('/lobby/:id', function(req, res, next) {
-  setCookie(req, res);
-
+router.get('/lobby/:lobbyId', checkLobbyId, function(req, res, next) {
   res.render('lobby', { 
     title,
-    lobby: lobby.getLobbies()[req.params.id],
+    lobby: lobby.getLobbyById(req.params.lobbyId),
   });
 });
 
-function setCookie(req, res){
-  if (!req.cookies[ID_COOKIE]){
-    res.cookie(ID_COOKIE, utils.getUniqueID(), {
-      maxAge: 1000 * 60 * 15000
-    })
-  }
-}
+//The 404 Route
+router.get('*', function(req, res){
+  res.render('404', { 
+    title,
+    message: 'Route Not Found',
+  });
+});
 
 module.exports = router;

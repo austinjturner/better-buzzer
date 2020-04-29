@@ -1,4 +1,7 @@
 
+//
+// WebSocket message types
+//
 const WS_MEMBER_REGISTER_MSG = 'member-register';
 const WS_MEMBER_NAME_MSG = 'member-name';
 const WS_MEMBER_ACTIVE_MSG = 'member-active';
@@ -6,100 +9,91 @@ const WS_MEMBER_FREEZE_MSG = 'member-freeze';
 const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
 const WS_BUZZER_RESULTS_MSG = 'buzzer-results';
 
+// 
+// HTML id tags
+// 
+const buzzerIndicatorId = 'buzzerIndicator';
+const buzzerBottomId = 'buzzerBottom';
+const buzzerTopId = 'buzzerTop';
+const buzzerLockoutTextId = 'buzzerLockoutText';
+const buzzerButtonUnpressedId = 'buzzerButtonUnpressed';
+const buzzerButtonPressedId = 'buzzerButtonPressed';
+const indicatorActiveClass = 'indicatorActive';
+const indicatorNotActiveClass = 'indicatorNotActive';
+
 const TOO_SOON_PENALTY_MS = 1000;
 
+/*
+ * Record the current state of the page
+ * 
+ *    indicator:  corresponds to the light indicating buzzer is active
+ *    disabled:   used to stop buzzer input, either is locked or not active
+ *    locked:     set when buzzer is pressed too early
+ *    timestamp:  time when indicator was turned on
+ *    disabled
+ */
 var buzzerState = {
     indicator: false,
     disabled: false,
     locked: false,
     timestamp: null,
-    disabled: false,
 }
 
+// cache that holds a copy of the latest page data
 var pageCache = {};
 
-
+// On load
 $(() => {
-    $("#nameText").change(function(){
-        updateName();
-    });
+    //freezeBuzzer(); // default is frozen
+    setBuzzerActive(false); // default is off
+    init();
 
-    $('#buzzer').click(()=>{
-        handleBuzzerClick();
-    })
-
-    $('#button-top').on('mousedown touchstart', () => {
-        if (buzzerState.locked) return;
-
-        $('#i1').attr('hidden', true);
-        $('#i2').attr('hidden', false);
-        handleBuzzerClick();
-    })
-
-    $(document).on('mouseup touchend', () => {
-        if (buzzerState.locked) return;
-
-        $('#i1').attr('hidden', false);
-        $('#i2').attr('hidden', true);
-    })
-
-    // disable right clicks on buzzer
+    // disable right clicks on elements of .selectDisable
+    // On mobile, holding down elements turns into a "right click"
     $('.selectDisable').bind('contextmenu', function(e) {
         return false;
     }); 
 
+    //
+    // Resigter listeners
+    //
+
+    // Event listener to display new page data
     document.addEventListener(WS_PAGE_UPDATE_MSG, function(e) {
         var data = e.detail;  // the "data" from the server is here
         updateLobbyPage(data);
     });
-    
-    freezeBuzzer(); // default is frozen
-    init();
+
+    // Listener for button press/touch
+    $('#'+buzzerTopId).on('mousedown touchstart', () => {
+        if (buzzerState.locked) return;  // Do nothing if locked out
+
+        $('#'+buzzerButtonUnpressedId).attr('hidden', true);
+        $('#'+buzzerButtonPressedId).attr('hidden', false);
+        handleBuzzerClick();
+    })
+
+    // Listener for button press/touch release
+    $(document).on('mouseup touchend', () => {
+        if (buzzerState.locked) return;  // Do nothing if locked out
+
+        $('#'+buzzerButtonUnpressedId).attr('hidden', false);
+        $('#'+buzzerButtonPressedId).attr('hidden', true);
+    })
 })
 
+// Update the page
 function updateLobbyPage(data){
+    // We only care if the buzzer status has changed
     if (data.buzzerActive == pageCache.buzzerActive) return;
 
-    if (data.buzzerActive){
-        activeBuzzer();
-    } else {
-        freezeBuzzer();
-    }
+    setBuzzerActive(data.buzzerActive);
 
     // save the data to compare later
     pageCache = data;
 }
 
-function setIndicatorActive(active){
-    if (active){
-        $('#lightBox').addClass('box-on');
-    } else {
-        $('#lightBox').removeClass('box-on');
-    }
-}
-
-function setBuzzerActive(active){
-    if (active){
-        buzzerState.timestamp = getTime();
-        buzzerState.active = true;
-    } else {
-        buzzerState.active = false;
-    }
-}
-
-function activeBuzzer(){
-    buzzerState.indicator = true;
-    buzzerState.disabled = false;
-    buzzerState.timestamp = getTime();
-    $('#lightBox').addClass('box-on');
-}
-
-function freezeBuzzer(){
-    buzzerState.indicator = false;
-    buzzerState.disabled = false;
-    $('#lightBox').removeClass('box-on');
-}
-
+// Initialize lobby page once we have the member's name
 function init(){
     var lobbyId = getLobbyId();
 
@@ -110,25 +104,23 @@ function init(){
         return;
     }
 
-
     // Open websocket
     sendWsMessage(WS_MEMBER_REGISTER_MSG, {
-        userId: getCookieValue(ID_COOKIE),
+        userId: getCookie(ID_COOKIE),
         lobbyId: lobbyId, 
         userName: getName(),
     });
 }
 
-function getTime(){
-    return Date.now();
-}
-
+// Logic for handling button clicks
 function handleBuzzerClick(){
+    // If disabled, nothing to do here...
     if (buzzerState.disabled){
         return;
     }
 
     if (buzzerState.indicator){
+        // If indicator is on, record time, play sound, and send the message
         playBuzzerNoise();
         buzzerState.disabled = true;
 
@@ -138,23 +130,53 @@ function handleBuzzerClick(){
             delta: delta,
         })
 
+        // show the chart
         openChart();
     } else {
-        // too soon penalty
+        // If indicator is off, lockout the buzzer for TOO_SOON_PENALTY_MS
         buzzerState.disabled = true;
         buzzerState.locked = true;
         
-        $('#i3').attr('hidden', false);
-        $('#i2').attr('hidden', false);
-        $('#i1').attr('hidden', true);
+        $('#'+buzzerLockoutTextId).attr('hidden', false);
+        $('#'+buzzerButtonPressedId).attr('hidden', false);
+        $('#'+buzzerButtonUnpressedId).attr('hidden', true);
 
         setTimeout(()=>{
             buzzerState.disabled = false;           
             buzzerState.locked = false;
-            $('#i3').attr('hidden', true);
-            $('#i2').attr('hidden', true);
-            $('#i1').attr('hidden', false);
+            $('#'+buzzerLockoutTextId).attr('hidden', true);
+            $('#'+buzzerButtonPressedId).attr('hidden', true);
+            $('#'+buzzerButtonUnpressedId).attr('hidden', false);
         }, TOO_SOON_PENALTY_MS)
     }
+}
+
+//
+// Helper functions
+//
+
+function setIndicatorActive(active){
+    if (active){
+        $('#'+buzzerIndicatorId).addClass(indicatorActiveClass);
+    } else {
+        $('#'+buzzerIndicatorId).removeClass(indicatorActiveClass);
+    }
+}
+
+function setBuzzerActive(active){
+    if (active){
+        buzzerState.indicator = true;
+        buzzerState.disabled = false;
+        buzzerState.timestamp = getTime();
+        setIndicatorActive(true);
+    } else {
+        buzzerState.indicator = false;
+        buzzerState.disabled = false;
+        setIndicatorActive(false);
+    }
+}
+
+function getTime(){
+    return Date.now();
 }
 

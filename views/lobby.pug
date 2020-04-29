@@ -1,19 +1,17 @@
-extends combine
+extends common
 
 block page
   script(src='/javascripts/lobby.js')
+  link(rel='stylesheet', href='/stylesheets/lobby.css')
   .container
-    .container.page-itemn.selectDisable
-      .buzzer-box
-        .box#lightBox
-        #button-bottom.button.selectDisable
-          #button-lockout(hidden)
-            svg(viewBox="0 0 60 30")
-              text(x="0" y="20") Too Early 
-          button#button-top
-            img.selectDisable#i1.button-unpressed(src='/images/buzzer-unpressed.svg' alt='Unpressed Buzzer' draggable='false')
-            img.selectDisable#i2.button-pressed(hidden src='/images/buzzer-pressed.svg' alt='Pressed Buzzer' draggable='false')
-          #i3.selectDisable.buzzer-text(hidden) Too Early
+    .container.pageItem
+      .buzzerBox
+        #buzzerIndicator.indicatorNotActive
+        #buzzerBottom.button.selectDisable
+          button#buzzerTop
+            img.selectDisable#buzzerButtonUnpressed(src='/images/buzzer-unpressed.svg' alt='Unpressed Buzzer' draggable='false')
+            img.selectDisable#buzzerButtonPressed(hidden src='/images/buzzer-pressed.svg' alt='Pressed Buzzer' draggable='false')
+          #buzzerLockoutText.selectDisable(hidden) Too Early
 
       
 
