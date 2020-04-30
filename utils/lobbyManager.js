@@ -10,7 +10,6 @@ const WS_HOST_REGISTER_MSG = 'host-register';
 const WS_MEMBER_REGISTER_MSG = 'member-register';
 const WS_HOST_ACTIVE_MSG = 'host-active';
 const WS_HOST_FREEZE_MSG = 'host-freeze';
-const WS_HOST_RESET_MSG = 'host-reset';
 const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
 const WS_PAGE_UPDATE_MSG = 'page-update';
 const WS_REQUEST_PAGE_UPDATE_MSG = 'request-page-update';
