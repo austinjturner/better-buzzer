@@ -23,7 +23,7 @@ A host should create the lobby first and generate a link for other members to jo
 * Hit the buzzer
 * Penalty for hitting buzzer before active (to prevent spamming)
 * View order of member buzzes
-* 
+
 ![Member Screenshot](https://i.imgur.com/PmQZNCk.png?1)
 
 ### Responsive UI Supports Mobile Viewing
@@ -35,11 +35,11 @@ A host should create the lobby first and generate a link for other members to jo
 ![Member Mobile Screenshot](https://i.imgur.com/iDcxCIq.png)
 
 ## Deploying
-The server for this project is written in [Node.js](https://nodejs.org/en/). The real-time updates between client and server are done via (WebSockets)[https://github.com/websockets/ws]. 
+The server for this project is written in [Node.js](https://nodejs.org/en/). The real-time updates between client and server are done via [WebSockets](https://github.com/websockets/ws). 
 
 To deploy this project, first install Node.js. Then run:
 ```
 git clone https://github.com/austinjturner/better-buzzer.git
 npm install
-npm run
+npm start
 ```
