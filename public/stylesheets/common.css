@@ -33,8 +33,13 @@
   overflow-y: auto;
 }
 
+.changeNameButton:hover {
+  cursor: pointer;
+  color: white;
+}
+
 .list-group-item-dark{
-  word-wrap: break-word;
+  word-break: break-all;
 }
 
 /* 

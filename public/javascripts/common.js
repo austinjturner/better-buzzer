@@ -9,8 +9,7 @@ const buzzerMp3Url = '/audio/buzzer.mp3';
 // WebSocket message types
 //
 const WS_HOST_REGISTER_MSG = 'host-register';
-const WS_HOST_NAME_MSG = 'host-name';
-const WS_MEMBER_LIST_MSG = 'member-list';
+const WS_UPDATE_NAME_MSG = 'update-name';
 const WS_HOST_ACTIVE_MSG = 'host-active';
 const WS_HOST_FREEZE_MSG = 'host-freeze';
 const WS_PAGE_UPDATE_MSG = 'page-update';
@@ -44,6 +43,8 @@ const resultsCanvasBottomId = 'resultsCanvasBottom';
 const canvasContainerRightId = 'canvasContainerRight';
 const resultsCanvasRightId = 'resultsCanvasRight';
 
+const changeNameButtonClass = 'changeNameButton';
+
 //
 // Page state variables
 //
@@ -64,7 +65,7 @@ $(() => {
     // If not, open modal
     var lobbyId = getLobbyId();
     if (!getCookie(lobbyId)){
-        $('#'+chooseNameModalId).modal('show');
+        displayChooseNameModal();
     }
 
     // determine whether to use chart for desktop or mobile
@@ -98,12 +99,12 @@ $(() => {
         var name = $('#'+chooseNameTextInputId).val();
 
         if (name){
-            setCookie(lobbyId, name, 1);
+            if (getCookie(lobbyId)){
+                updateName(name);
+            } else {
+                registerName(name);
+            }
             $('#'+chooseNameModalId).modal('hide');
-
-            // create a new event
-            var event = new CustomEvent('name-set', {})
-            document.dispatchEvent(event);
         }
     });
 
@@ -138,7 +139,6 @@ $(() => {
         // close left panel
         setLeftPanel(false);
     });
-
     
     // listen for clicks on dismiss bottom panel button
     $('#'+sidebarBottomCollapseButtonId).click(() => {
@@ -163,22 +163,40 @@ $(() => {
 // Update page to display the latest data
 function updatePage(data){
     var hostName = data.host.userName;
+    var hostUserId = data.host.userId;
     var memberNameList = [];
     for (id in data.members){
-        memberNameList.push(data.members[id].userName);
+        memberNameList.push({
+            userId: id,
+            userName: data.members[id].userName,
+        });
     }
 
-    updateLobby(hostName, memberNameList);
+    updateLobby(hostName, hostUserId, memberNameList);
     updateChart(data.round)
 }
 
 // Update HTML to display most recent lobby members
-function updateLobby(hostName, memberNameList){
+function updateLobby(hostName, hostUserId, memberNameList){
+    let userId = getCookie(ID_COOKIE);
+    
+    function wrapName(name, id){
+        if (id === userId){
+            name += `
+                <div class="changeNameButton" onclick="displayChooseNameModal()">
+                    <i class="fas fa-edit"></i>
+                </div>`;
+        }
+        return name;
+    }
+
     // update host
     $('#'+hostId).empty();
     $('#'+hostId).append(`
         <ul class="list-group list-group-flush">
-            <li class="list-group-item list-group-item-dark">${hostName}</li>
+            <li class="list-group-item list-group-item-dark d-flex justify-content-between">
+                ${wrapName(hostName, hostUserId)}
+            </li>
         </ul>
     `);
 
@@ -186,12 +204,14 @@ function updateLobby(hostName, memberNameList){
     $('#'+memberListId).empty();
     if (memberNameList.length == 0){
         $('#'+memberListId).append(`
-            <li class="list-group-item list-group-item-dark">No members</li>
+            <li class="list-group-item list-group-item-dark d-flex justify-content-between">No members</li>
         `)
     } else {
-        for (memberName of memberNameList){
+        for (member of memberNameList){
             $('#'+memberListId).append(`
-                <li class="list-group-item list-group-item-dark">${memberName}</li>
+                <li class="list-group-item list-group-item-dark d-flex justify-content-between">
+                    ${wrapName(member.userName, member.userId)}
+                </li>
             `)
         }
     }
@@ -265,6 +285,31 @@ function getName(){
     return getCookie(getLobbyId());
 }
 
+function updateName(name){
+    let lobbyId = getLobbyId();
+    setCookie(lobbyId, name, 1);
+
+    // Send message to update name
+    sendWsMessage(WS_UPDATE_NAME_MSG, {
+        lobbyId: lobbyId, 
+        userName: name,
+    });
+}
+
+function registerName(name){
+    let lobbyId = getLobbyId();
+    setCookie(lobbyId, name, 1);
+
+    // create a new event
+    var event = new CustomEvent('name-set', {})
+    document.dispatchEvent(event);
+}
+
+function displayChooseNameModal(){
+    $('#'+chooseNameTextInputId).val('');
+    $('#'+chooseNameModalId).modal('show');
+}
+
 function openRightCollapse(){
     $('#'+sidebarRightCollapseButtonId).click();
 }
@@ -309,7 +354,7 @@ function ChartManager(){
         'rgb(75, 192, 192)',
         'rgb(153, 102, 255)',
         'rgb(255, 205, 86)',
-        'rgb(201, 203, 207)'
+        'rgb(201, 203, 207)',
     ]
     this.ALPHA = 0.5,
     this.colorCounter = 0,

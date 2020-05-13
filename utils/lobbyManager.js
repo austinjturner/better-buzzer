@@ -13,6 +13,7 @@ const WS_HOST_FREEZE_MSG = 'host-freeze';
 const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
 const WS_PAGE_UPDATE_MSG = 'page-update';
 const WS_REQUEST_PAGE_UPDATE_MSG = 'request-page-update';
+const WS_UPDATE_NAME_MSG = 'update-name';
 
 // Contains all lobbies indexed by lobbyId
 // This is just held in memory, lobbies aren't meant to be persistent
@@ -106,6 +107,14 @@ function Lobby(){
         return this.members[userId] ? this.members[userId].userName : null;
     }
 
+    this.setUserName = function(userId, newUsername){
+        if (this.host.userId === userId){
+            this.host.userName = newUsername;
+        } else {
+            this.members[userId].userName = newUsername;
+        }
+    }
+
     // Enable/disable the buzzer
     this.setBuzzerActive = function(buzzerActive){
         this.buzzerActive = buzzerActive;
@@ -134,8 +143,9 @@ function Lobby(){
             return a.delta - b.delta;
         })
     
+        // TODO: I think this is bugged, removing for now
         // find people with the same response time, then shuffle
-        var start = 0, end;
+        /*var start = 0, end;
         while (start < this.round.length){
             var end = start;
             while(end + 1 < this.round.length && (this.round[start].delta == this.round[end + 1].delta)){
@@ -144,7 +154,7 @@ function Lobby(){
             common.shuffleSubArray(this.round, start, end);
     
             start = end + 1;
-        }
+        }*/
     }
 
     // Push a lobby update message to a single user via their userId
@@ -224,6 +234,19 @@ function handleMemberBuzzerMsg(ws, data){
     lobby.updateAll();
 }
 websocket.registerMessageHander(WS_MEMBER_BUZZER_MSG, handleMemberBuzzerMsg);
+
+function handleNameChange(ws, data){
+    let lobbyId = data.lobbyId;
+    let userName = data.userName;
+    let userId = ws.userId;
+
+    let lobby = getLobbyById(lobbyId);
+    lobby.setUserName(userId, userName);
+    lobby.updateAll();
+}
+websocket.registerMessageHander(WS_UPDATE_NAME_MSG, handleNameChange);
+
+
 
 function handleUpdateUser(ws, data){
     let lobbyId = data.lobbyId;
