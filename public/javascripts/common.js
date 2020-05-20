@@ -183,7 +183,7 @@ function updateLobby(hostName, hostUserId, memberNameList){
     function wrapName(name, id){
         if (id === userId){
             name += `
-                <div class="changeNameButton" onclick="displayChooseNameModal()">
+                <div class="${changeNameButtonClass}" onclick="displayChooseNameModal()">
                     <i class="fas fa-edit"></i>
                 </div>`;
         }
@@ -306,7 +306,7 @@ function registerName(name){
 }
 
 function displayChooseNameModal(){
-    $('#'+chooseNameTextInputId).val('');
+    $('#'+chooseNameTextInputId).val(getName() || '');
     $('#'+chooseNameModalId).modal('show');
 }
 

@@ -3,11 +3,7 @@
 // WebSocket message types
 //
 const WS_MEMBER_REGISTER_MSG = 'member-register';
-//const WS_MEMBER_NAME_MSG = 'member-name';
-//const WS_MEMBER_ACTIVE_MSG = 'member-active';
-//const WS_MEMBER_FREEZE_MSG = 'member-freeze';
 const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
-//const WS_BUZZER_RESULTS_MSG = 'buzzer-results';
 
 // 
 // HTML id tags
