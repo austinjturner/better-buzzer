@@ -38,6 +38,11 @@
   color: white;
 }
 
+.kickMemberButton:hover {
+  cursor: pointer;
+  color: #c0392b;
+}
+
 .list-group-item-dark{
   word-break: break-all;
 }

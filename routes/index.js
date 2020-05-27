@@ -48,6 +48,12 @@ router.get('/lobby/:lobbyId', checkLobbyId, function(req, res, next) {
   });
 });
 
+router.get('/kicked', function(req, res, next) {
+  res.render('kicked', { 
+    title,
+  });
+});
+
 //The 404 Route
 router.get('*', function(req, res){
   res.render('404', { 

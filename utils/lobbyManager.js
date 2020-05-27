@@ -14,6 +14,8 @@ const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
 const WS_PAGE_UPDATE_MSG = 'page-update';
 const WS_REQUEST_PAGE_UPDATE_MSG = 'request-page-update';
 const WS_UPDATE_NAME_MSG = 'update-name';
+const WS_KICK_MEMBER_MSG = 'kick-member';
+const WS_KICKED_MSG = 'kicked';
 
 // Contains all lobbies indexed by lobbyId
 // This is just held in memory, lobbies aren't meant to be persistent
@@ -32,6 +34,10 @@ function getLobbyById(lobbyId){
 
 function lobbyIdExists(lobbyId){
     return lobbies[lobbyId] ? true : false;
+}
+
+function formatTimeDelta(delta){
+    return Number(delta).toFixed(3);  // 3 decimals
 }
 
 // Constructor for lobby object
@@ -130,7 +136,7 @@ function Lobby(){
         this.round.push({
             userId: userId,
             userName: this.getUserName(userId),
-            delta: delta,
+            delta: formatTimeDelta(delta),
         });
     
         this.sortRound();
@@ -155,6 +161,13 @@ function Lobby(){
     
             start = end + 1;
         }*/
+    }
+
+    // remove a user from the lobby (if present)
+    this.kickMember = function(userId){
+        if (!this.members[userId]) return;
+        websocket.send(this.members[userId].ws, WS_KICKED_MSG, {});
+        delete this.members[userId];
     }
 
     // Push a lobby update message to a single user via their userId
@@ -246,8 +259,6 @@ function handleNameChange(ws, data){
 }
 websocket.registerMessageHander(WS_UPDATE_NAME_MSG, handleNameChange);
 
-
-
 function handleUpdateUser(ws, data){
     let lobbyId = data.lobbyId;
 
@@ -255,6 +266,16 @@ function handleUpdateUser(ws, data){
     lobby.updateUser(ws.userId);
 }
 websocket.registerMessageHander(WS_REQUEST_PAGE_UPDATE_MSG, handleUpdateUser);
+
+function handleKickMemberMessage(ws, data){
+    let lobbyId = data.lobbyId;
+    let userIdToKick = data.userIdToKick;
+
+    let lobby = getLobbyById(lobbyId);
+    lobby.kickMember(userIdToKick);
+    lobby.updateAll();
+}
+websocket.registerMessageHander(WS_KICK_MEMBER_MSG, handleKickMemberMessage);
 
 function handleClose(ws){
     if(ws.userId) {

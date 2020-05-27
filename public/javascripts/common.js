@@ -14,6 +14,7 @@ const WS_HOST_ACTIVE_MSG = 'host-active';
 const WS_HOST_FREEZE_MSG = 'host-freeze';
 const WS_PAGE_UPDATE_MSG = 'page-update';
 const WS_REQUEST_PAGE_UPDATE_MSG = 'request-page-update';
+const WS_KICK_MEMBER_MSG = 'kick-member';
 
 // 
 // HTML id tags
@@ -44,6 +45,7 @@ const canvasContainerRightId = 'canvasContainerRight';
 const resultsCanvasRightId = 'resultsCanvasRight';
 
 const changeNameButtonClass = 'changeNameButton';
+const kickMemberButtonClass = 'kickMemberButton';
 
 //
 // Page state variables
@@ -179,16 +181,22 @@ function updatePage(data){
 // Update HTML to display most recent lobby members
 function updateLobby(hostName, hostUserId, memberNameList){
     let userId = getCookie(ID_COOKIE);
-    
+
     function wrapName(name, id){
         if (id === userId){
             name += `
                 <div class="${changeNameButtonClass}" onclick="displayChooseNameModal()">
                     <i class="fas fa-edit"></i>
                 </div>`;
+        } else if (isHost()){
+            name += `
+                <div class="${kickMemberButtonClass}" onclick="kickMemberById('${id}')">
+                    <i class="fas fa-user-times"></i>
+                </div>`;
         }
         return name;
     }
+
 
     // update host
     $('#'+hostId).empty();
@@ -274,6 +282,11 @@ function setLeftPanel(visible){
 // Helper functions
 //
 
+// Determine if host
+function isHost(){
+    return window.location.href.includes('host');
+}
+
 // Get lobby id from URL
 function getLobbyId(){
     var split = window.location.href.split('/');
@@ -303,6 +316,13 @@ function registerName(name){
     // create a new event
     var event = new CustomEvent('name-set', {})
     document.dispatchEvent(event);
+}
+
+function kickMemberById(id){
+    sendWsMessage(WS_KICK_MEMBER_MSG, {
+        lobbyId: getLobbyId(), 
+        userIdToKick: id,
+    });
 }
 
 function displayChooseNameModal(){

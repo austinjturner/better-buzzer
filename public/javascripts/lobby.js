@@ -4,6 +4,7 @@
 //
 const WS_MEMBER_REGISTER_MSG = 'member-register';
 const WS_MEMBER_BUZZER_MSG = 'member-buzzer';
+const WS_KICKED_MSG = 'kicked';
 
 // 
 // HTML id tags
@@ -59,6 +60,12 @@ $(() => {
         var data = e.detail;  // the "data" from the server is here
         updateLobbyPage(data);
     });
+
+    // In case kicked
+    document.addEventListener(WS_KICKED_MSG, function(e) {
+        window.location.href = '/kicked'
+    });
+
 
     // Listener for button press/touch
     $('#'+buzzerTopId).on('mousedown touchstart', () => {
@@ -173,6 +180,6 @@ function setBuzzerActive(active){
 }
 
 function getTime(){
-    return Date.now();
+    return window.performance.now();
 }
 
