@@ -100,7 +100,7 @@ $(() => {
     $('#'+chooseNameButtonId).click(e => {
         var name = $('#'+chooseNameTextInputId).val();
 
-        if (name){
+        if (name && name.length < 50){
             if (getCookie(lobbyId)){
                 updateName(name);
             } else {
